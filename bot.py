@@ -37,6 +37,24 @@ def register_user(message):
 
     connection.close()
 
+@bot.message_handler(content_types=['document'])
+def handle_docs(message):
+    title = message.document.file_name
+    file_id= message.document.file_id
+    user_id = message.from_user.id
+
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+
+    #cursor.execute('SELECT (file_id, user_id, uploaded_by) FROM materials WHERE (file_id, user_id, uploaded_by) = (?, ?, ?)', (file_id, user_id, user_id))
+
+    cursor.execute('INSERT INTO materials (title, file_id, uploaded_by) VALUES (?, ?, ?)', (title, file_id, user_id))
+
+    connection.commit()
+    connection.close()
+
+    bot.send_message(message.chat.id, "Файл успешно сохранен!")
+
 if __name__ == "__main__":
     print("Бот успешно запущен и слушает команды...")
     bot.infinity_polling()
